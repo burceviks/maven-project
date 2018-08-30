@@ -1,15 +1,24 @@
 pipeline {
     agent any
-    stages{
-          stage('SCM Checkout'){
-            steps{         
-                    git 'https://github.com/burceviks/maven-project'
-                 }
-                               }
-        stage('Build'){
-            steps{
-                    def mvnHome =  tool name: 'maven-3', type: 'maven'
-                    sh "${mvnHome}/bin/mvn clean package"
+    tools { 
+        maven 'maven-3' 
+    }
+    stages {
+        stage ('Build') {
+            steps {
+                sh "mvn clean package"
+            }
+            post{
+                success{
+                    sh ' echo "success!!! Archiving" '
+                    archiveArtifacts artifacts: '**/target/*.war'
+                }
+            }
+        }
+
+        stage ('Last Step') {
+            steps {
+                echo 'This is a minimal pipeline.'
             }
         }
     }
